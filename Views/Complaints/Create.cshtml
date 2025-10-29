@@ -1,0 +1,67 @@
+@model ComplaintManagementSystem.Models.Complaint
+@{
+    ViewData["Title"] = "Submit Complaint";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="bi bi-megaphone"></i> Submit New Complaint</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Complaint Title *</label>
+                            <input asp-for="Title" class="form-control" placeholder="Brief title for your complaint" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">Category *</label>
+                            <select asp-for="Category" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <option value="@category">@category</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description *</label>
+                            <textarea asp-for="Description" class="form-control" rows="5" 
+                                      placeholder="Describe your complaint in detail..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StudentName" class="form-label">Your Name</label>
+                            <input asp-for="StudentName" class="form-control" placeholder="Enter your name (optional if anonymous)" />
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="IsAnonymous" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsAnonymous" class="form-check-label">
+                                Submit Anonymously
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send"></i> Submit Complaint
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

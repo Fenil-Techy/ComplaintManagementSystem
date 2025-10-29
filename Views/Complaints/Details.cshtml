@@ -1,0 +1,235 @@
+@model ComplaintManagementSystem.Models.Complaint
+@{
+    ViewData["Title"] = "Complaint Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-file-text"></i> @Model.Title</h4>
+                    <a asp-action="Index" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-primary fs-6 me-2">
+                            <i class="bi bi-tag"></i> @Model.Category
+                        </span>
+                        <span class="badge fs-6 @(Model.Status == ComplaintManagementSystem.Models.ComplaintStatus.Resolved ? "bg-success" : Model.Status == ComplaintManagementSystem.Models.ComplaintStatus.InProgress ? "bg-warning text-dark" : "bg-secondary")">
+                            <i class="bi bi-circle-fill"></i> @Model.Status
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted">Description</h5>
+                        <p class="lead">@Model.Description</p>
+                    </div>
+
+                    <div class="row text-muted mb-3">
+                        <div class="col-md-6">
+                            <i class="bi bi-person-circle"></i> <strong>Submitted by:</strong> @Model.StudentName
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-calendar-event"></i> <strong>Date:</strong> @Model.SubmittedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <button class="btn @(ViewBag.HasLiked ? "btn-danger" : "btn-outline-danger") me-2" id="likeBtn" data-id="@Model.Id">
+                            <i class="bi bi-heart-fill"></i> <span id="likeText">@(ViewBag.HasLiked ? "Liked" : "Like")</span>
+                        </button>
+                        <span class="fs-5"><strong id="likeCount">@Model.LikesCount</strong> likes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Comments (@Model.Comments.Count)</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddComment" method="post" class="mb-4">
+                        <input type="hidden" name="complaintId" value="@Model.Id" />
+                        
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="userName" name="userName" 
+                                        placeholder="Enter your name (optional)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="commentText" class="form-label">Your Comment *</label>
+                            <textarea class="form-control" id="commentText" name="commentText" 
+                                            rows="3" placeholder="Share your thoughts or suggestions..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Post Comment
+                        </button>
+                    </form>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <hr />
+
+                    @if (Model.Comments.Count == 0)
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-chat-square-text fs-1"></i>
+                            <p class="mt-2">No comments yet. Be the first to comment!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="comments-list">
+                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.PostedAt))
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <i class="bi bi-person-circle"></i> 
+                                                    <strong>@comment.UserName</strong>
+                                                </h6>
+                                                <p class="text-muted small mb-2">
+                                                    <i class="bi bi-clock"></i> 
+                                                    @comment.PostedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0">@comment.Text</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-graph-up"></i> Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-heart-fill text-danger"></i> 
+                            <strong>@Model.LikesCount</strong> people support this
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-chat-fill text-primary"></i> 
+                            <strong>@Model.Comments.Count</strong> comments
+                        </li>
+                        <li>
+                            <i class="bi bi-eye-fill text-success"></i> 
+                            Public visibility
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Status Information</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Status == ComplaintManagementSystem.Models.ComplaintStatus.Pending)
+                    {
+                        <div class="alert alert-secondary" role="alert">
+                            <i class="bi bi-hourglass-split"></i> 
+                            <strong>Pending Review</strong>
+                            <p class="mb-0 small mt-2">This complaint is awaiting review by the administration.</p>
+                        </div>
+                    }
+                    else if (Model.Status == ComplaintManagementSystem.Models.ComplaintStatus.InProgress)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-gear-fill"></i> 
+                            <strong>In Progress</strong>
+                            <p class="mb-0 small mt-2">The administration is actively working on resolving this issue.</p>
+                        </div>
+                    }
+                    else if (Model.Status == ComplaintManagementSystem.Models.ComplaintStatus.Resolved)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <i class="bi bi-check-circle-fill"></i> 
+                            <strong>Resolved</strong>
+                            <p class="mb-0 small mt-2">This complaint has been successfully resolved!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Handle like button functionality
+        document.getElementById('likeBtn').addEventListener('click', function() {
+            const complaintId = this.dataset.id;
+            
+            // Sending the ID as a query string parameter for controller binding (from previous fix)
+            fetch('/Complaints/ToggleLike?id=' + complaintId, { 
+                method: 'POST',
+            })
+            .then(response => {
+                if (!response.ok) {
+                     throw new Error('Network response was not ok.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // *** THIS IS THE KEY CHANGE ***
+                    // ONLY update the like count on the main card and the sidebar stat.
+                    document.getElementById('likeCount').textContent = data.likesCount;
+                    document.querySelector('.list-unstyled strong').textContent = data.likesCount; // Update quick stats
+                    
+                    // The following block is REMOVED to stop the button text/style from toggling:
+                    /*
+                    const btn = document.getElementById('likeBtn');
+                    const likeText = document.getElementById('likeText');
+                    
+                    if (data.isLiked) {
+                        btn.classList.remove('btn-outline-danger');
+                        btn.classList.add('btn-danger');
+                        likeText.textContent = 'Liked';
+                    } else {
+                        btn.classList.remove('btn-danger');
+                        btn.classList.add('btn-outline-danger');
+                        likeText.textContent = 'Like';
+                    }
+                    */
+                    
+                } else {
+                    alert('Error toggling like status: ' + (data.message || 'Unknown error.'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('An unexpected error occurred. Check the network console.');
+            });
+        });
+    </script>
+}

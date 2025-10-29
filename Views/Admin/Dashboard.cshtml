@@ -1,0 +1,217 @@
+@model List<ComplaintManagementSystem.Models.Complaint>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var stats = ViewBag.Stats as ComplaintManagementSystem.Services.ComplaintStats ?? new ComplaintManagementSystem.Services.ComplaintStats();
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+        <a asp-controller="Complaints" asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-eye"></i> View Public Page
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Total Complaints</h6>
+                            <h2 class="mb-0">@stats.TotalComplaints</h2>
+                        </div>
+                        <i class="bi bi-file-earmark-text fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Pending</h6>
+                            <h2 class="mb-0">@stats.PendingComplaints</h2>
+                        </div>
+                        <i class="bi bi-hourglass-split fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">In Progress</h6>
+                            <h2 class="mb-0">@stats.InProgressComplaints</h2>
+                        </div>
+                        <i class="bi bi-gear-fill fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Resolved</h6>
+                            <h2 class="mb-0">@stats.ResolvedComplaints</h2>
+                        </div>
+                        <i class="bi bi-check-circle-fill fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5><i class="bi bi-heart-fill text-danger"></i> Total Likes</h5>
+                    <h2>@stats.TotalLikes</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5><i class="bi bi-chat-fill text-primary"></i> Total Comments</h5>
+                    <h2>@stats.TotalComments</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-list-check"></i> Manage Complaints</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Student</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Likes</th>
+                            <th>Comments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    No complaints submitted yet.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var complaint in Model)
+                            {
+                                <tr>
+                                    <td>@complaint.Id</td>
+                                    <td>
+                                        <strong>@complaint.Title</strong>
+                                        <br />
+                                        <small class="text-muted">@(complaint.Description.Length > 50 ? complaint.Description.Substring(0, 50) + "..." : complaint.Description)</small>
+                                    </td>
+                                    <td><span class="badge bg-primary">@complaint.Category</span></td>
+                                    <td>@complaint.StudentName</td>
+                                    <td>@complaint.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <span class="badge @(complaint.Status == ComplaintManagementSystem.Models.ComplaintStatus.Resolved ? "bg-success" : complaint.Status == ComplaintManagementSystem.Models.ComplaintStatus.InProgress ? "bg-warning text-dark" : "bg-secondary")">
+                                            @complaint.Status
+                                        </span>
+                                    </td>
+                                    <td><i class="bi bi-heart-fill text-danger"></i> @complaint.LikesCount</td>
+                                    <td><i class="bi bi-chat-fill text-primary"></i> @complaint.Comments.Count</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                            data-bs-toggle="dropdown">
+                                                Update Status
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                @* Status change to Pending *@
+                                                @if (complaint.Status != ComplaintManagementSystem.Models.ComplaintStatus.Pending)
+                                                {
+                                                    <li>
+                                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="@complaint.Id" />
+                                                            <input type="hidden" name="status" value="@ComplaintManagementSystem.Models.ComplaintStatus.Pending" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="bi bi-hourglass"></i> Mark as Pending
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                                @* Status change to In Progress *@
+                                                @if (complaint.Status != ComplaintManagementSystem.Models.ComplaintStatus.InProgress)
+                                                {
+                                                    <li>
+                                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="@complaint.Id" />
+                                                            <input type="hidden" name="status" value="@ComplaintManagementSystem.Models.ComplaintStatus.InProgress" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="bi bi-gear"></i> Mark as In Progress
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                                @* Status change to Resolved *@
+                                                @if (complaint.Status != ComplaintManagementSystem.Models.ComplaintStatus.Resolved)
+                                                {
+                                                    <li>
+                                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="@complaint.Id" />
+                                                            <input type="hidden" name="status" value="@ComplaintManagementSystem.Models.ComplaintStatus.Resolved" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="bi bi-check-circle"></i> Mark as Resolved
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                        
+                                        <a asp-controller="Complaints" asp-action="AdminDetails" asp-route-id="@complaint.Id" 
+                                           class="btn btn-sm btn-info ms-1">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

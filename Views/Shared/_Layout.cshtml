@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Complaint Management System</title>
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    @* Renders any section defined in the view's head (e.g., custom CSS) *@
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    
+  <header style="
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 12px 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+">
+    <div class="container-fluid" style="display: flex; justify-content: flex-end; align-items: center;">
+        <a asp-controller="Home" asp-action="Logout"
+           style="
+               background-color: rgba(255, 255, 255, 0.15);
+               color: white;
+               text-decoration: none;
+               padding: 8px 18px;
+               border-radius: 8px;
+               font-weight: 500;
+               transition: all 0.3s ease;
+               backdrop-filter: blur(6px);
+           "
+           onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.25)'"
+           onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'">
+           Logout
+        </a>
+    </div>
+</header>
+
+
+
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - Complaint Management System
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
