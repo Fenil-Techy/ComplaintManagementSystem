@@ -70,6 +70,7 @@ ComplaintManagementSystem/
 ```bash
 git clone https://github.com/Fenil-Techy/ComplainManagementSystem.git
 cd ComplaintManagementSystem
+code .
 ```
 
 2. **Restore dependencies**
